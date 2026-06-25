@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Engineering Portfolio</title>
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
+  <style>
+    /* ── TOKENS ── */
+    :root {
+      --bg:        #0d0f12;
+      --surface:   #151820;
+      --surface2:  #1c2030;
+      --border:    #2a2f42;
+      --accent:    #4af0c4;
+      --accent2:   #5b8cff;
+      --text:      #e8eaf2;
+      --muted:     #7a8099;
+      --danger:    #ff5f6d;
+
+      --font-display: 'Courier New', 'Courier', monospace;
+      --font-body:    'Inter', system-ui, sans-serif;
+
+      --radius:   6px;
+      --sidebar-w: 260px;
+      --header-h:  56px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 14px;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ── */
+    header {
+      height: var(--header-h);
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      gap: 16px;
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      font-family: var(--font-display);
+      font-size: 15px;
+      color: var(--accent);
+      letter-spacing: 0.08em;
+      white-space: nowrap;
+    }
+    .logo span { color: var(--muted); }
+
+    .header-nav {
+      display: flex;
+      gap: 4px;
+      margin-left: auto;
+    }
+    .header-nav button {
+      background: none;
+      border: 1px solid transparent;
+      color: var(--muted);
+      padding: 6px 14px;
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.15s;
+    }
+    .header-nav button:hover,
+    .header-nav button.active {
+      border-color: var(--border);
+      color: var(--text);
+      background: var(--surface2);
+    }
+    .header-nav button.active {
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .badge {
+      display: inline-block;
+      background: var(--accent);
+      color: #000;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 10px;
+      margin-left: 6px;
+      vertical-align: middle;
+    }
+
+    /* ── LAYOUT ── */
+    .app-body {
+      display: flex;
+      margin-top: var(--header-h);
+      flex: 1;
+    }
+
+    /* ── SIDEBAR ── */
+    aside {
+      width: var(--sidebar-w);
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      padding: 16px 0;
+      position: fixed;
+      top: var(--header-h);
+      bottom: 0;
+      overflow-y: auto;
+    }
+
+    .sidebar-section {
+      padding: 0 12px;
+      margin-bottom: 20px;
+    }
+    .sidebar-label {
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 0 8px;
+      margin-bottom: 6px;
+    }
+
+    .file-tree { list-style: none; }
+    .file-tree li { display: flex; flex-direction: column; }
+
+    .tree-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 8px;
+      border-radius: var(--radius);
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 13px;
+      transition: all 0.12s;
+      user-select: none;
+    }
+    .tree-item:hover { background: var(--surface2); color: var(--text); }
+    .tree-item.active { background: var(--surface2); color: var(--accent); }
+    .tree-item .icon { font-size: 14px; width: 18px; text-align: center; flex-shrink: 0; }
+
+    .tree-children {
+      padding-left: 20px;
+      display: none;
+    }
+    .tree-children.open { display: block; }
+
+    .tag {
+      margin-left: auto;
+      font-size: 10px;
+      padding: 1px 6px;
+      border-radius: 4px;
+      background: var(--surface2);
+      color: var(--muted);
+      border: 1px solid var(--border);
+    }
+    .tag.glb { color: var(--accent); border-color: var(--accent); background: rgba(74,240,196,0.08); }
+    .tag.pdf { color: var(--accent2); border-color: var(--accent2); background: rgba(91,140,255,0.08); }
+    .tag.img { color: #f0b44a; border-color: #f0b44a; background: rgba(240,180,74,0.08); }
+
+    /* ── MAIN ── */
+    main {
+      margin-left: var(--sidebar-w);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── PAGES ── */
+    .page { display: none; }
+    .page.active { display: flex; flex-direction: column; flex: 1; }
+
+    /* ── HOME PAGE ── */
+    .home-hero {
+      padding: 60px 48px 40px;
+      border-bottom: 1px solid var(--border);
+    }
+    .eyebrow {
+      font-family: var(--font-display);
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+    .home-hero h1 {
+      font-size: 40px;
+      font-weight: 300;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+      max-width: 560px;
+    }
+    .home-hero h1 strong {
+      font-weight: 700;
+      color: var(--accent);
+    }
+    .home-hero p {
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 520px;
+      margin-bottom: 28px;
+    }
+    .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+    .btn {
+      padding: 10px 20px;
+      border-radius: var(--radius);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      transition: all 0.15s;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #000;
+    }
+    .btn-primary:hover { background: #5fffd6; }
+    .btn-outline {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+
+    .stats-row {
+      display: flex;
+      gap: 0;
+      border-top: 1px solid var(--border);
+    }
+    .stat {
+      flex: 1;
+      padding: 24px 32px;
+      border-right: 1px solid var(--border);
+    }
+    .stat:last-child { border-right: none; }
+    .stat-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--accent);
+      font-family: var(--font-display);
+    }
+    .stat-label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .project-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border-top: 1px solid var(--border);
+    }
+
+    .project-card {
+      background: var(--surface);
+      padding: 24px;
+      cursor: pointer;
+      transition: background 0.15s;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .project-card:hover { background: var(--surface2); }
+
+    .card-thumb {
+      width: 100%;
+      height: 140px;
+      background: linear-gradient(135deg, var(--surface2) 0%, #1a2040 100%);
+      border-radius: var(--radius);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      border: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+    .card-thumb::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, transparent 50%, rgba(0,0,0,0.4) 100%);
+    }
+    .card-title { font-size: 15px; font-weight: 600; }
+    .card-meta { font-size: 12px; color: var(--muted); display: flex; gap: 8px; flex-wrap: wrap; }
+    .chip {
+      padding: 2px 8px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .chip.cad { color: var(--accent2); border-color: var(--accent2); }
+    .chip.mfg { color: var(--accent); border-color: var(--accent); }
+
+    /* ── VIEWER PAGE ── */
+    .viewer-topbar {
+      height: 44px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      gap: 12px;
+    }
+    .viewer-topbar span { font-size: 13px; color: var(--muted); }
+    .viewer-topbar strong { color: var(--text); }
+    .viewer-tools {
+      margin-left: auto;
+      display: flex;
+      gap: 4px;
+    }
+    .tool-btn {
+      background: none;
+      border: 1px solid transparent;
+      color: var(--muted);
+      padding: 5px 10px;
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-size: 12px;
+      transition: all 0.12s;
+    }
+    .tool-btn:hover { background: var(--surface2); border-color: var(--border); color: var(--text); }
+    .tool-btn.active { color: var(--accent); border-color: var(--accent); }
+
+    .viewer-layout {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .viewer-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: #0a0c10;
+    }
+
+    model-viewer {
+      flex: 1;
+      width: 100%;
+      background: radial-gradient(ellipse at center, #141828 0%, #0a0c10 100%);
+      --poster-color: transparent;
+    }
+
+    .viewer-controls {
+      height: 48px;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      gap: 12px;
+    }
+    .ctrl-group { display: flex; gap: 4px; }
+    .ctrl-btn {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.12s;
+    }
+    .ctrl-btn:hover { color: var(--text); border-color: var(--accent); }
+
+    .viewer-info {
+      width: 280px;
+      background: var(--surface);
+      border-left: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+
+    .info-section {
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .info-section h3 {
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 5px 0;
+      font-size: 13px;
+    }
+    .info-row .key { color: var(--muted); }
+    .info-row .val { color: var(--text); font-family: var(--font-display); font-size: 12px; }
+
+    .upload-zone {
+      margin: 16px;
+      border: 2px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.15s;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .upload-zone:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(74,240,196,0.04);
+    }
+    .upload-zone .upload-icon { font-size: 28px; margin-bottom: 8px; }
+
+    /* ── ABOUT PAGE ── */
+    .about-layout {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 0;
+      flex: 1;
+      border-top: 1px solid var(--border);
+    }
+    .about-main { padding: 40px 48px; border-right: 1px solid var(--border); }
+    .about-main h2 { font-size: 24px; font-weight: 600; margin-bottom: 16px; }
+    .about-main p { color: var(--muted); line-height: 1.75; margin-bottom: 16px; font-size: 14px; }
+
+    .skill-group { margin-bottom: 24px; }
+    .skill-group h4 { font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+    .skill-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+    .skill-tag {
+      padding: 4px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+    .skill-tag.highlight { border-color: var(--accent); color: var(--accent); background: rgba(74,240,196,0.07); }
+
+    .about-sidebar { padding: 24px; }
+    .contact-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+    .contact-card h4 { font-size: 13px; font-weight: 600; margin-bottom: 12px; }
+    .contact-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 0;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .contact-item a { color: var(--accent); text-decoration: none; }
+    .contact-item a:hover { text-decoration: underline; }
+
+    /* ── SETTINGS PAGE ── */
+    .settings-wrap { padding: 40px 48px; max-width: 640px; }
+    .settings-wrap h2 { font-size: 22px; font-weight: 600; margin-bottom: 4px; }
+    .settings-wrap .sub { color: var(--muted); margin-bottom: 32px; font-size: 13px; }
+
+    .settings-group {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+    .settings-group-title {
+      padding: 12px 16px;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+      background: var(--surface2);
+    }
+    .setting-row {
+      display: flex;
+      align-items: center;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      gap: 12px;
+    }
+    .setting-row:last-child { border-bottom: none; }
+    .setting-info { flex: 1; }
+    .setting-info .setting-name { font-size: 13px; font-weight: 500; margin-bottom: 2px; }
+    .setting-info .setting-desc { font-size: 12px; color: var(--muted); }
+
+    .toggle {
+      width: 40px;
+      height: 22px;
+      background: var(--surface2);
+      border-radius: 11px;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      position: relative;
+      flex-shrink: 0;
+      transition: all 0.2s;
+    }
+    .toggle::after {
+      content: '';
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      background: var(--muted);
+      border-radius: 50%;
+      top: 2px;
+      left: 2px;
+      transition: all 0.2s;
+    }
+    .toggle.on { background: rgba(74,240,196,0.2); border-color: var(--accent); }
+    .toggle.on::after { background: var(--accent); left: 20px; }
+
+    .setting-select {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 6px 10px;
+      border-radius: var(--radius);
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    /* ── EMPTY STATE ── */
+    .empty-state {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      color: var(--muted);
+      padding: 60px;
+      text-align: center;
+    }
+    .empty-state .big-icon { font-size: 56px; opacity: 0.4; }
+    .empty-state h3 { font-size: 18px; color: var(--text); font-weight: 500; }
+    .empty-state p { font-size: 13px; max-width: 320px; line-height: 1.6; }
+
+    /* ── TOAST ── */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--surface2);
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      padding: 10px 18px;
+      border-radius: var(--radius);
+      font-size: 13px;
+      z-index: 999;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: all 0.2s;
+      pointer-events: none;
+    }
+    #toast.show { opacity: 1; transform: translateY(0); }
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    @media (max-width: 768px) {
+      aside { display: none; }
+      main { margin-left: 0; }
+      .about-layout { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<header>
+  <div class="logo">ENG<span>/</span>PORTFOLIO</div>
+  <nav class="header-nav">
+    <button class="active" onclick="showPage('home')">Projects</button>
+    <button onclick="showPage('viewer')">3D Viewer</button>
+    <button onclick="showPage('about')">About</button>
+    <button onclick="showPage('settings')">Settings</button>
+  </nav>
+</header>
+
+<!-- ── BODY ── -->
+<div class="app-body">
+
+  <!-- SIDEBAR -->
+  <aside>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Repository</div>
+      <ul class="file-tree">
+        <li>
+          <div class="tree-item active" onclick="toggleTree(this)">
+            <span class="icon">📁</span> projects
+          </div>
+          <ul class="tree-children open">
+            <li>
+              <div class="tree-item" onclick="toggleTree(this)">
+                <span class="icon">📁</span> suspension-bracket
+              </div>
+              <ul class="tree-children open">
+                <li><div class="tree-item" onclick="loadModel('suspension')"><span class="icon">⬡</span> assembly.glb <span class="tag glb">GLB</span></div></li>
+                <li><div class="tree-item" onclick="showToast('Opening PDF…')"><span class="icon">📄</span> analysis.pdf <span class="tag pdf">PDF</span></div></li>
+                <li><div class="tree-item" onclick="showToast('Opening image…')"><span class="icon">🖼</span> render.png <span class="tag img">IMG</span></div></li>
+              </ul>
+            </li>
+            <li>
+              <div class="tree-item" onclick="toggleTree(this)">
+                <span class="icon">📁</span> heat-exchanger
+              </div>
+              <ul class="tree-children">
+                <li><div class="tree-item" onclick="loadModel('heat')"><span class="icon">⬡</span> exchanger.glb <span class="tag glb">GLB</span></div></li>
+                <li><div class="tree-item" onclick="showToast('Opening PDF…')"><span class="icon">📄</span> cfd-report.pdf <span class="tag pdf">PDF</span></div></li>
+              </ul>
+            </li>
+            <li>
+              <div class="tree-item" onclick="toggleTree(this)">
+                <span class="icon">📁</span> drone-frame
+              </div>
+              <ul class="tree-children">
+                <li><div class="tree-item" onclick="loadModel('drone')"><span class="icon">⬡</span> frame.glb <span class="tag glb">GLB</span></div></li>
+                <li><div class="tree-item" onclick="showToast('Opening PDF…')"><span class="icon">📄</span> fea-results.pdf <span class="tag pdf">PDF</span></div></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <div class="tree-item" onclick="toggleTree(this)">
+            <span class="icon">📁</span> references
+          </div>
+          <ul class="tree-children">
+            <li><div class="tree-item" onclick="showToast('Opening PDF…')"><span class="icon">📄</span> resume.pdf <span class="tag pdf">PDF</span></div></li>
+            <li><div class="tree-item" onclick="showToast('Opening PDF…')"><span class="icon">📄</span> certifications.pdf <span class="tag pdf">PDF</span></div></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">Quick Actions</div>
+      <div class="tree-item" onclick="showPage('viewer'); showToast('Drop a .GLB file to preview')">
+        <span class="icon">⬆</span> Upload Model
+      </div>
+      <div class="tree-item" onclick="showToast('Link copied to clipboard!')">
+        <span class="icon">🔗</span> Copy Share Link
+      </div>
+      <div class="tree-item" onclick="showToast('Generating PDF export…')">
+        <span class="icon">↓</span> Export Portfolio PDF
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── MAIN ── -->
+  <main>
+
+    <!-- HOME PAGE -->
+    <div class="page active" id="page-home">
+      <div class="home-hero">
+        <div class="eyebrow">// mechanical engineering portfolio</div>
+        <h1>Designed for <strong>precision.</strong><br>Built for review.</h1>
+        <p>A private collection of engineering work including CAD assemblies, FEA studies, and manufacturing drawings. Shared directly with employers — not indexed publicly.</p>
+        <div class="hero-actions">
+          <button class="btn btn-primary" onclick="showPage('viewer')">Open 3D Viewer</button>
+          <button class="btn btn-outline" onclick="showToast('Link copied!')">Copy Portfolio Link</button>
+        </div>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat">
+          <div class="stat-value">12</div>
+          <div class="stat-label">Projects</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">8</div>
+          <div class="stat-label">3D Models</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">4</div>
+          <div class="stat-label">FEA Studies</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">3</div>
+          <div class="stat-label">Years Experience</div>
+        </div>
+      </div>
+
+      <div class="project-grid">
+        <div class="project-card" onclick="openProject('suspension')">
+          <div class="card-thumb">⚙️</div>
+          <div class="card-title">Suspension Bracket Redesign</div>
+          <div class="card-meta">
+            <span class="chip cad">SolidWorks</span>
+            <span class="chip mfg">CNC Milled</span>
+            <span class="chip">Al 6061</span>
+          </div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.6">Reduced part weight by 22% while maintaining fatigue life over 500k cycles. Validated with FEA and physical testing.</div>
+        </div>
+
+        <div class="project-card" onclick="openProject('heat')">
+          <div class="card-thumb">🔥</div>
+          <div class="card-title">Shell & Tube Heat Exchanger</div>
+          <div class="card-meta">
+            <span class="chip cad">Fusion 360</span>
+            <span class="chip">CFD</span>
+            <span class="chip">SS 316</span>
+          </div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.6">Designed for 180°C oil-to-water transfer at 8 bar. Modeled in Ansys Fluent with 94% efficiency match to analytical results.</div>
+        </div>
+
+        <div class="project-card" onclick="openProject('drone')">
+          <div class="card-thumb">🚁</div>
+          <div class="card-title">Carbon Fibre Drone Frame</div>
+          <div class="card-meta">
+            <span class="chip cad">CATIA V5</span>
+            <span class="chip">FEA</span>
+            <span class="chip">CFRP</span>
+          </div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.6">Custom UAV frame optimized for torsional stiffness. Layup schedule determined through composite FEA, manufactured in-house.</div>
+        </div>
+
+        <div class="project-card" onclick="showToast('Add your project files to unlock this card')">
+          <div class="card-thumb" style="border-style:dashed;color:var(--muted)">+</div>
+          <div class="card-title" style="color:var(--muted)">Add Project</div>
+          <div style="font-size:12px;color:var(--muted)">Upload .GLB, .PDF, and image files to add a new project card.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEWER PAGE -->
+    <div class="page" id="page-viewer">
+      <div class="viewer-topbar">
+        <span>Viewing: <strong id="viewer-filename">no file loaded</strong></span>
+        <div class="viewer-tools">
+          <button class="tool-btn active" onclick="setViewMode(this,'orbit')">⟳ Orbit</button>
+          <button class="tool-btn" onclick="setViewMode(this,'pan')">✥ Pan</button>
+          <button class="tool-btn" onclick="setViewMode(this,'zoom')">⊕ Zoom</button>
+          <span style="width:1px;background:var(--border);margin:0 4px;display:inline-block;height:20px"></span>
+          <button class="tool-btn" onclick="resetCamera()">⊡ Reset</button>
+          <button class="tool-btn" onclick="showToast('Screenshot saved!')">📷 Capture</button>
+        </div>
+      </div>
+
+      <div class="viewer-layout">
+        <div class="viewer-main">
+          <model-viewer
+            id="mv"
+            src=""
+            camera-controls
+            auto-rotate
+            shadow-intensity="1"
+            exposure="1"
+            tone-mapping="neutral"
+            ar
+            ar-modes="webxr scene-viewer quick-look">
+          </model-viewer>
+
+          <!-- Empty state shown when no model -->
+          <div class="empty-state" id="viewer-empty">
+            <div class="big-icon">⬡</div>
+            <h3>No model loaded</h3>
+            <p>Select a .GLB file from the sidebar, or drop one below to preview it instantly in your browser.</p>
+            <label style="cursor:pointer">
+              <input type="file" accept=".glb,.gltf" style="display:none" onchange="loadLocalFile(event)">
+              <span class="btn btn-primary">Browse Files</span>
+            </label>
+          </div>
+
+          <div class="viewer-controls">
+            <div class="ctrl-group">
+              <div class="ctrl-btn" title="Front view" onclick="setCamera('0deg 90deg auto')">F</div>
+              <div class="ctrl-btn" title="Side view"  onclick="setCamera('90deg 90deg auto')">S</div>
+              <div class="ctrl-btn" title="Top view"   onclick="setCamera('0deg 0deg auto')">T</div>
+              <div class="ctrl-btn" title="Isometric"  onclick="setCamera('45deg 55deg auto')">I</div>
+            </div>
+            <span style="flex:1"></span>
+            <span style="font-size:12px;color:var(--muted)" id="camera-pos">θ — φ —</span>
+          </div>
+        </div>
+
+        <!-- Viewer Info Panel -->
+        <div class="viewer-info">
+          <div class="info-section">
+            <h3>File Details</h3>
+            <div class="info-row"><span class="key">Format</span><span class="val" id="info-format">—</span></div>
+            <div class="info-row"><span class="key">Size</span><span class="val" id="info-size">—</span></div>
+            <div class="info-row"><span class="key">Source</span><span class="val" id="info-source">—</span></div>
+          </div>
+
+          <div class="info-section">
+            <h3>Model Info</h3>
+            <div class="info-row"><span class="key">Vertices</span><span class="val" id="info-verts">—</span></div>
+            <div class="info-row"><span class="key">Triangles</span><span class="val" id="info-tris">—</span></div>
+            <div class="info-row"><span class="key">Materials</span><span class="val" id="info-mats">—</span></div>
+            <div class="info-row"><span class="key">Textures</span><span class="val" id="info-tex">—</span></div>
+          </div>
+
+          <div class="info-section">
+            <h3>Display</h3>
+            <div class="info-row">
+              <span class="key">Auto-rotate</span>
+              <div class="toggle on" id="toggle-rotate" onclick="toggleAutoRotate(this)"></div>
+            </div>
+            <div class="info-row">
+              <span class="key">Shadows</span>
+              <div class="toggle on" id="toggle-shadow" onclick="toggleShadow(this)"></div>
+            </div>
+            <div class="info-row">
+              <span class="key">Environment</span>
+              <select class="setting-select" onchange="setEnv(this.value)">
+                <option>Neutral</option>
+                <option>Legacy</option>
+                <option>Commerce</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="upload-zone" onclick="document.getElementById('file-input').click()">
+            <div class="upload-icon">⬡</div>
+            Drop .GLB here or click to browse
+            <input type="file" id="file-input" accept=".glb,.gltf" style="display:none" onchange="loadLocalFile(event)">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ABOUT PAGE -->
+    <div class="page" id="page-about">
+      <div style="padding:28px 48px 20px;border-bottom:1px solid var(--border)">
+        <div class="eyebrow">// about me</div>
+        <h2 style="font-size:26px;font-weight:300">Your Name <strong style="font-weight:700;color:var(--accent)">— Mechanical Engineer</strong></h2>
+      </div>
+
+      <div class="about-layout">
+        <div class="about-main">
+          <p>Currently seeking full-time roles in <strong>mechanical design, product development,</strong> or <strong>structural analysis</strong>. I approach engineering problems with a focus on clean geometry, justified tolerances, and results I can defend with data.</p>
+          <p>Recent work spans lightweight structural components, thermal systems, and composite manufacturing. I'm comfortable taking a part from concept sketch to machined deliverable and I document every step along the way.</p>
+
+          <div style="margin-top:28px">
+            <div class="skill-group">
+              <h4>CAD & Simulation</h4>
+              <div class="skill-tags">
+                <span class="skill-tag highlight">SolidWorks</span>
+                <span class="skill-tag highlight">Fusion 360</span>
+                <span class="skill-tag">CATIA V5</span>
+                <span class="skill-tag">Ansys Mechanical</span>
+                <span class="skill-tag">Ansys Fluent</span>
+                <span class="skill-tag">SimScale</span>
+              </div>
+            </div>
+            <div class="skill-group">
+              <h4>Manufacturing</h4>
+              <div class="skill-tags">
+                <span class="skill-tag highlight">CNC Milling</span>
+                <span class="skill-tag">Composite Layup</span>
+                <span class="skill-tag">Sheet Metal</span>
+                <span class="skill-tag">FDM / SLA</span>
+                <span class="skill-tag">GD&T</span>
+                <span class="skill-tag">Technical Drawing</span>
+              </div>
+            </div>
+            <div class="skill-group">
+              <h4>Tools & Standards</h4>
+              <div class="skill-tags">
+                <span class="skill-tag">ASME Y14.5</span>
+                <span class="skill-tag">ISO 2768</span>
+                <span class="skill-tag">MATLAB</span>
+                <span class="skill-tag">Python</span>
+                <span class="skill-tag">Git</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="about-sidebar">
+          <div class="contact-card">
+            <h4>Contact</h4>
+            <div class="contact-item">📧 <a href="mailto:you@email.com">you@email.com</a></div>
+            <div class="contact-item">🔗 <a href="#">linkedin.com/in/yourname</a></div>
+            <div class="contact-item">🐙 <a href="#">github.com/yourname</a></div>
+            <div class="contact-item">📍 City, State</div>
+          </div>
+
+          <div class="contact-card">
+            <h4>Education</h4>
+            <div class="contact-item" style="flex-direction:column;align-items:flex-start;gap:2px">
+              <strong>B.S. Mechanical Engineering</strong>
+              <span>University Name · 20XX</span>
+              <span style="color:var(--accent);font-size:12px">GPA: 3.X / 4.0</span>
+            </div>
+          </div>
+
+          <button class="btn btn-primary" style="width:100%;margin-bottom:8px" onclick="showToast('Opening resume PDF…')">View Resume PDF</button>
+          <button class="btn btn-outline" style="width:100%" onclick="showToast('Link copied!')">Copy Portfolio Link</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS PAGE -->
+    <div class="page" id="page-settings">
+      <div class="settings-wrap">
+        <h2>Settings</h2>
+        <div class="sub">Control privacy, display, and sharing options for this portfolio.</div>
+
+        <div class="settings-group">
+          <div class="settings-group-title">Privacy</div>
+          <div class="setting-row">
+            <div class="setting-info">
+              <div class="setting-name">Search engine indexing</div>
+              <div class="setting-desc">When off, robots.txt and meta tags prevent Google from listing this site.</div>
+            </div>
+            <div class="toggle" onclick="toggleSetting(this)"></div>
+          </div>
+          <div class="setting-row">
+            <div class="setting-info">
+              <div class="setting-name">Password protection</div>
+              <div class="setting-desc">Require a passphrase before visitors can view the portfolio.</div>
+            </div>
+            <div class="toggle" onclick="toggleSetting(this)"></div>
+          </div>
+          <div class="setting-row">
+            <div class="setting-info">
+              <div class="setting-name">Download protection</div>
+              <div class="setting-desc">Disable right-click and direct .GLB file URL access.</div>
+            </div>
+            <div class="toggle on" onclick="toggleSetting(this)"></div>
+          </div>
+        </div>
+
+        <div class="settings-group">
+          <div class="settings-group-title">3D Viewer Defaults</div>
+          <div class="setting-row">
+            <div class="setting-info">
+              <div class="setting-name">Auto-rotate on load</div>
+              <div class="setting-desc">Models spin on first load to show all sides to the viewer.</div>
+            </div>
+            <div class="toggle on" onclick="toggleSetting(this)"></div>
+          </div>
+          <div class="setting-row">
+            <div class="setting-info">
+              <div class="setting-name">Default lighting</div>
+              <div class="setting-desc">Environment map used for all model previews.</div>
+            </div>
+            <select class="setting-select">
+              <option>Neutral</option>
+              <option>Legacy</option>
+              <option>Commerce</option>
+              <option>Spruit Sunrise</option>
+            </select>
+          </div>
+          <div class="setting-row">
+            <div class="setting-info">
+              <div class="setting-name">AR mode</div>
+              <div class="setting-desc">Allow employers to place your model in their physical space via mobile AR.</div>
+            </div>
+            <div class="toggle on" onclick="toggleSetting(this)"></div>
+          </div>
+        </div>
+
+        <div class="settings-group">
+          <div class="settings-group-title">Portfolio Info</div>
+          <div class="setting-row">
+            <div class="setting-info">
+              <div class="setting-name">Owner name</div>
+            </div>
+            <input style="background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:var(--radius);font-size:13px;width:180px" placeholder="Your Name">
+          </div>
+          <div class="setting-row">
+            <div class="setting-info">
+              <div class="setting-name">Page title</div>
+            </div>
+            <input style="background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:var(--radius);font-size:13px;width:180px" placeholder="Engineering Portfolio">
+          </div>
+        </div>
+
+        <button class="btn btn-primary" onclick="showToast('Settings saved!')">Save Changes</button>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+  // ── PAGE NAV ──
+  function showPage(id) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-' + id).classList.add('active');
+    document.querySelectorAll('.header-nav button').forEach((b, i) => {
+      const pages = ['home','viewer','about','settings'];
+      b.classList.toggle('active', pages[i] === id);
+    });
+  }
+
+  // ── TREE TOGGLE ──
+  function toggleTree(el) {
+    const children = el.nextElementSibling;
+    if (children && children.classList.contains('tree-children')) {
+      children.classList.toggle('open');
+    }
+    document.querySelectorAll('.tree-item').forEach(i => i.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  // ── MODEL VIEWER ──
+  const mv = document.getElementById('mv');
+  const emptyState = document.getElementById('viewer-empty');
+
+  function loadModel(name) {
+    showPage('viewer');
+    // In production, point to real .glb files
+    const models = {
+      suspension: '',
+      heat: '',
+      drone: ''
+    };
+    document.getElementById('viewer-filename').textContent = name + '.glb';
+    document.getElementById('info-format').textContent = 'GLB 2.0';
+    document.getElementById('info-size').textContent = '—';
+    document.getElementById('info-source').textContent = 'Repository';
+    document.getElementById('info-verts').textContent = '—';
+    document.getElementById('info-tris').textContent = '—';
+    document.getElementById('info-mats').textContent = '—';
+    document.getElementById('info-tex').textContent = '—';
+    emptyState.style.display = 'flex';
+    showToast('Add the .glb file to your repository to preview');
+  }
+
+  function loadLocalFile(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    mv.src = url;
+    emptyState.style.display = 'none';
+    document.getElementById('viewer-filename').textContent = file.name;
+    document.getElementById('info-format').textContent = file.name.endsWith('.glb') ? 'GLB 2.0' : 'GLTF';
+    document.getElementById('info-size').textContent = (file.size / 1024 / 1024).toFixed(2) + ' MB';
+    document.getElementById('info-source').textContent = 'Local upload';
+    showToast('Model loaded — use orbit controls to inspect');
+  }
+
+  function resetCamera() {
+    mv.cameraTarget = 'auto auto auto';
+    mv.cameraOrbit = '0deg 75deg 105%';
+    showToast('Camera reset');
+  }
+
+  function setCamera(orbit) {
+    mv.cameraOrbit = orbit;
+  }
+
+  function setViewMode(btn, mode) {
+    document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    showToast(mode.charAt(0).toUpperCase() + mode.slice(1) + ' mode');
+  }
+
+  function setEnv(val) {
+    mv.toneMapping = val.toLowerCase();
+  }
+
+  function toggleAutoRotate(el) {
+    el.classList.toggle('on');
+    mv.autoRotate = el.classList.contains('on');
+  }
+
+  function toggleShadow(el) {
+    el.classList.toggle('on');
+    mv.shadowIntensity = el.classList.contains('on') ? 1 : 0;
+  }
+
+  // ── SETTINGS TOGGLES ──
+  function toggleSetting(el) { el.classList.toggle('on'); }
+
+  // ── PROJECT CARDS ──
+  function openProject(name) { loadModel(name); }
+
+  // ── TOAST ──
+  let toastTimer;
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+  }
+
+  // drag-and-drop on viewer
+  document.addEventListener('dragover', e => e.preventDefault());
+  document.addEventListener('drop', e => {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    if (file && (file.name.endsWith('.glb') || file.name.endsWith('.gltf'))) {
+      const ev = { target: { files: [file] } };
+      showPage('viewer');
+      loadLocalFile(ev);
+    }
+  });
+</script>
+</body>
+</html>
