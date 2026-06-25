@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Engineering Portfolio</title>
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:        #f8f7f4;
+      --surface:   #ffffff;
+      --surface2:  #f3f2ef;
+      --border:    #e4e2dc;
+      --border2:   #ccc9c0;
+      --accent:    #1a56db;
+      --accent-lt: #eff4ff;
+      --text:      #1a1917;
+      --muted:     #6b6860;
+      --muted2:    #9b9890;
+      --green:     #166534;
+      --green-lt:  #dcfce7;
+
+      --font: 'Inter', system-ui, sans-serif;
+      --mono: 'JetBrains Mono', monospace;
+      --r: 6px;
+      --sidebar: 240px;
+      --header: 52px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    /* HEADER */
+    header {
+      height: var(--header);
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      gap: 12px;
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      letter-spacing: 0.02em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .logo-dot {
+      width: 8px; height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+    }
+
+    .header-nav {
+      display: flex;
+      gap: 2px;
+      margin-left: auto;
+    }
+    .nav-btn {
+      background: none;
+      border: none;
+      color: var(--muted);
+      padding: 6px 12px;
+      border-radius: var(--r);
+      cursor: pointer;
+      font-size: 13px;
+      font-family: var(--font);
+      transition: all 0.12s;
+    }
+    .nav-btn:hover { background: var(--surface2); color: var(--text); }
+    .nav-btn.active { background: var(--accent-lt); color: var(--accent); font-weight: 500; }
+
+    /* LAYOUT */
+    .body-wrap {
+      display: flex;
+      margin-top: var(--header);
+      min-height: calc(100vh - var(--header));
+    }
+
+    /* SIDEBAR */
+    aside {
+      width: var(--sidebar);
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      position: fixed;
+      top: var(--header);
+      bottom: 0;
+      overflow-y: auto;
+      padding: 12px 0;
+    }
+
+    .sb-section { margin-bottom: 8px; }
+    .sb-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted2);
+      padding: 6px 16px 4px;
+    }
+
+    .tree { list-style: none; }
+    .tree li { display: flex; flex-direction: column; }
+
+    .ti {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 5px 16px;
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 13px;
+      transition: all 0.1s;
+      border-radius: 0;
+      user-select: none;
+    }
+    .ti:hover { background: var(--surface2); color: var(--text); }
+    .ti.sel { background: var(--accent-lt); color: var(--accent); }
+
+    .ti-icon {
+      font-size: 13px;
+      width: 16px;
+      text-align: center;
+      flex-shrink: 0;
+      opacity: 0.7;
+    }
+
+    .tc { padding-left: 16px; display: none; }
+    .tc.open { display: block; }
+
+    .ftag {
+      margin-left: auto;
+      font-size: 10px;
+      font-family: var(--mono);
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-weight: 500;
+    }
+    .ftag.glb { background: var(--accent-lt); color: var(--accent); }
+    .ftag.pdf { background: #fef3c7; color: #92400e; }
+    .ftag.img { background: var(--green-lt); color: var(--green); }
+
+    .sb-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 8px 16px;
+    }
+
+    /* MAIN */
+    main {
+      margin-left: var(--sidebar);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .page { display: none; flex-direction: column; flex: 1; }
+    .page.active { display: flex; }
+
+    /* HOME */
+    .home-top {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 40px 48px 32px;
+    }
+    .eyebrow {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+    .home-top h1 {
+      font-size: 32px;
+      font-weight: 300;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      margin-bottom: 12px;
+    }
+    .home-top h1 b { font-weight: 600; }
+    .home-top p {
+      color: var(--muted);
+      max-width: 500px;
+      margin-bottom: 24px;
+      line-height: 1.65;
+    }
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .btn {
+      padding: 8px 18px;
+      border-radius: var(--r);
+      font-size: 13px;
+      font-weight: 500;
+      font-family: var(--font);
+      cursor: pointer;
+      border: none;
+      transition: all 0.12s;
+    }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: #1648c7; }
+    .btn-ghost {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border2);
+    }
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+    .stats-bar {
+      display: flex;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+    .stat {
+      flex: 1;
+      padding: 16px 24px;
+      border-right: 1px solid var(--border);
+    }
+    .stat:last-child { border-right: none; }
+    .stat-n {
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--text);
+      font-family: var(--mono);
+    }
+    .stat-l { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+    .proj-grid {
+      padding: 24px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 12px;
+    }
+
+    .proj-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .proj-card:hover {
+      border-color: var(--accent);
+      box-shadow: 0 2px 12px rgba(26,86,219,0.08);
+    }
+
+    .card-icon {
+      width: 40px; height: 40px;
+      background: var(--accent-lt);
+      border-radius: var(--r);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      margin-bottom: 14px;
+    }
+    .card-title { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+    .card-desc { font-size: 12px; color: var(--muted); line-height: 1.6; margin-bottom: 12px; }
+    .card-chips { display: flex; gap: 4px; flex-wrap: wrap; }
+    .chip {
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 500;
+      background: var(--surface2);
+      color: var(--muted);
+      border: 1px solid var(--border);
+    }
+    .chip.a { background: var(--accent-lt); color: var(--accent); border-color: transparent; }
+    .chip.g { background: var(--green-lt); color: var(--green); border-color: transparent; }
+
+    .add-card {
+      background: transparent;
+      border: 1px dashed var(--border2);
+      border-radius: 8px;
+      padding: 20px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      color: var(--muted2);
+      font-size: 13px;
+      transition: all 0.15s;
+      min-height: 160px;
+    }
+    .add-card:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-lt); }
+    .add-card .plus { font-size: 22px; }
+
+    /* VIEWER */
+    .viewer-bar {
+      height: 40px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      gap: 8px;
+    }
+    .vb-name { font-size: 13px; color: var(--muted); }
+    .vb-name b { color: var(--text); font-weight: 500; }
+    .vb-tools { margin-left: auto; display: flex; gap: 3px; }
+    .vt-btn {
+      background: none;
+      border: 1px solid transparent;
+      color: var(--muted);
+      padding: 4px 10px;
+      border-radius: var(--r);
+      cursor: pointer;
+      font-size: 12px;
+      font-family: var(--font);
+      transition: all 0.1s;
+    }
+    .vt-btn:hover { background: var(--surface2); border-color: var(--border); color: var(--text); }
+    .vt-btn.on { background: var(--accent-lt); color: var(--accent); border-color: transparent; }
+
+    .viewer-body { display: flex; flex: 1; overflow: hidden; }
+
+    .viewer-stage {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg);
+      position: relative;
+    }
+
+    model-viewer {
+      width: 100%;
+      flex: 1;
+      background: #f0efe9;
+      --poster-color: transparent;
+    }
+
+    .viewer-empty {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      color: var(--muted);
+      text-align: center;
+      padding: 40px;
+      background: var(--bg);
+    }
+    .ve-icon {
+      width: 56px; height: 56px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      margin-bottom: 4px;
+    }
+    .viewer-empty h3 { font-size: 15px; font-weight: 500; color: var(--text); }
+    .viewer-empty p { font-size: 13px; max-width: 280px; line-height: 1.6; }
+
+    .viewer-foot {
+      height: 44px;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      gap: 8px;
+    }
+    .cam-btn {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      width: 28px; height: 28px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 600;
+      font-family: var(--mono);
+      transition: all 0.1s;
+    }
+    .cam-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    .viewer-panel {
+      width: 256px;
+      background: var(--surface);
+      border-left: 1px solid var(--border);
+      overflow-y: auto;
+    }
+
+    .panel-sec {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .panel-sec h4 {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted2);
+      margin-bottom: 10px;
+    }
+    .p-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px 0;
+      font-size: 13px;
+    }
+    .p-row .k { color: var(--muted); }
+    .p-row .v { color: var(--text); font-family: var(--mono); font-size: 12px; }
+
+    .toggle {
+      width: 36px; height: 20px;
+      background: var(--border2);
+      border-radius: 10px;
+      cursor: pointer;
+      position: relative;
+      transition: background 0.2s;
+      flex-shrink: 0;
+      border: none;
+    }
+    .toggle::after {
+      content: '';
+      position: absolute;
+      width: 14px; height: 14px;
+      background: #fff;
+      border-radius: 50%;
+      top: 3px; left: 3px;
+      transition: left 0.2s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    .toggle.on { background: var(--accent); }
+    .toggle.on::after { left: 19px; }
+
+    .drop-zone {
+      margin: 12px;
+      border: 1.5px dashed var(--border2);
+      border-radius: var(--r);
+      padding: 20px 12px;
+      text-align: center;
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 12px;
+      transition: all 0.15s;
+      line-height: 1.6;
+    }
+    .drop-zone:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-lt); }
+
+    /* ABOUT */
+    .about-head {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 32px 48px 24px;
+    }
+    .about-name { font-size: 24px; font-weight: 300; letter-spacing: -0.01em; }
+    .about-name b { font-weight: 600; }
+    .about-role { color: var(--muted); margin-top: 4px; font-size: 14px; }
+
+    .about-body {
+      display: grid;
+      grid-template-columns: 1fr 280px;
+      flex: 1;
+    }
+
+    .about-left { padding: 32px 48px; border-right: 1px solid var(--border); }
+    .about-left p { color: var(--muted); line-height: 1.75; margin-bottom: 14px; font-size: 14px; }
+
+    .sk-group { margin-bottom: 20px; }
+    .sk-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted2);
+      margin-bottom: 8px;
+    }
+    .sk-tags { display: flex; gap: 5px; flex-wrap: wrap; }
+    .sk-tag {
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+    .sk-tag.hi { background: var(--accent-lt); border-color: transparent; color: var(--accent); }
+
+    .about-right { padding: 24px; }
+    .info-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+    .info-card h5 { font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.06em; }
+    .ic-row { display: flex; align-items: center; gap: 8px; padding: 4px 0; font-size: 13px; color: var(--muted); }
+    .ic-row a { color: var(--accent); text-decoration: none; }
+    .ic-row a:hover { text-decoration: underline; }
+
+    /* SETTINGS */
+    .settings-body { padding: 32px 48px; max-width: 600px; }
+    .settings-body h2 { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+    .settings-body .sub { color: var(--muted); font-size: 13px; margin-bottom: 28px; }
+
+    .sg {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 16px;
+      overflow: hidden;
+    }
+    .sg-head {
+      padding: 10px 16px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted2);
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+    }
+    .s-row {
+      display: flex;
+      align-items: center;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      gap: 12px;
+    }
+    .s-row:last-child { border-bottom: none; }
+    .s-info { flex: 1; }
+    .s-name { font-size: 13px; font-weight: 500; margin-bottom: 2px; }
+    .s-desc { font-size: 12px; color: var(--muted); }
+
+    .s-select {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 5px 8px;
+      border-radius: var(--r);
+      font-size: 13px;
+      font-family: var(--font);
+      cursor: pointer;
+    }
+    .s-input {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 5px 10px;
+      border-radius: var(--r);
+      font-size: 13px;
+      font-family: var(--font);
+      width: 160px;
+    }
+    .s-input:focus, .s-select:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+    /* TOAST */
+    #toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--text);
+      color: #fff;
+      padding: 9px 16px;
+      border-radius: var(--r);
+      font-size: 13px;
+      z-index: 999;
+      opacity: 0;
+      transform: translateY(6px);
+      transition: all 0.18s;
+      pointer-events: none;
+    }
+    #toast.show { opacity: 1; transform: none; }
+
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+    @media (max-width: 720px) {
+      aside { display: none; }
+      main { margin-left: 0; }
+      .about-body { grid-template-columns: 1fr; }
+      .home-top { padding: 24px; }
+      .proj-grid { padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-dot"></div>
+    Engineering Portfolio
+  </div>
+  <nav class="header-nav">
+    <button class="nav-btn active" onclick="nav('home')">Projects</button>
+    <button class="nav-btn" onclick="nav('viewer')">3D Viewer</button>
+    <button class="nav-btn" onclick="nav('about')">About</button>
+    <button class="nav-btn" onclick="nav('settings')">Settings</button>
+  </nav>
+</header>
+
+<div class="body-wrap">
+
+  <!-- SIDEBAR -->
+  <aside>
+    <div class="sb-section">
+      <div class="sb-label">Files</div>
+      <ul class="tree">
+        <li>
+          <div class="ti sel" onclick="fold(this)">
+            <span class="ti-icon">▾</span> projects
+          </div>
+          <ul class="tc open">
+            <li>
+              <div class="ti" onclick="fold(this)">
+                <span class="ti-icon">▸</span> suspension-bracket
+              </div>
+              <ul class="tc">
+                <li><div class="ti" onclick="loadModel('suspension')"><span class="ti-icon">◈</span> assembly.glb <span class="ftag glb">GLB</span></div></li>
+                <li><div class="ti" onclick="toast('Opening PDF…')"><span class="ti-icon">⊡</span> analysis.pdf <span class="ftag pdf">PDF</span></div></li>
+                <li><div class="ti" onclick="toast('Opening image…')"><span class="ti-icon">⊞</span> render.png <span class="ftag img">IMG</span></div></li>
+              </ul>
+            </li>
+            <li>
+              <div class="ti" onclick="fold(this)">
+                <span class="ti-icon">▸</span> heat-exchanger
+              </div>
+              <ul class="tc">
+                <li><div class="ti" onclick="loadModel('heat')"><span class="ti-icon">◈</span> exchanger.glb <span class="ftag glb">GLB</span></div></li>
+                <li><div class="ti" onclick="toast('Opening PDF…')"><span class="ti-icon">⊡</span> cfd-report.pdf <span class="ftag pdf">PDF</span></div></li>
+              </ul>
+            </li>
+            <li>
+              <div class="ti" onclick="fold(this)">
+                <span class="ti-icon">▸</span> drone-frame
+              </div>
+              <ul class="tc">
+                <li><div class="ti" onclick="loadModel('drone')"><span class="ti-icon">◈</span> frame.glb <span class="ftag glb">GLB</span></div></li>
+                <li><div class="ti" onclick="toast('Opening PDF…')"><span class="ti-icon">⊡</span> fea-results.pdf <span class="ftag pdf">PDF</span></div></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <div class="ti" onclick="fold(this)">
+            <span class="ti-icon">▸</span> references
+          </div>
+          <ul class="tc">
+            <li><div class="ti" onclick="toast('Opening PDF…')"><span class="ti-icon">⊡</span> resume.pdf <span class="ftag pdf">PDF</span></div></li>
+            <li><div class="ti" onclick="toast('Opening PDF…')"><span class="ti-icon">⊡</span> certifications.pdf <span class="ftag pdf">PDF</span></div></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+
+    <div class="sb-divider"></div>
+
+    <div class="sb-section">
+      <div class="sb-label">Actions</div>
+      <div class="ti" onclick="nav('viewer'); toast('Drop a .GLB file to preview')">
+        <span class="ti-icon">↑</span> Upload model
+      </div>
+      <div class="ti" onclick="toast('Link copied!')">
+        <span class="ti-icon">⊡</span> Copy share link
+      </div>
+      <div class="ti" onclick="toast('Generating export…')">
+        <span class="ti-icon">↓</span> Export as PDF
+      </div>
+    </div>
+  </aside>
+
+  <main>
+
+    <!-- HOME -->
+    <div class="page active" id="page-home">
+      <div class="home-top">
+        <div class="eyebrow">Mechanical Engineering · Private Portfolio</div>
+        <h1>Designed with <b>intent.</b><br>Built to last.</h1>
+        <p>A curated set of engineering projects — CAD assemblies, structural analysis, and manufacturing work. Shared directly for employer review.</p>
+        <div class="actions">
+          <button class="btn btn-primary" onclick="nav('viewer')">Open 3D Viewer</button>
+          <button class="btn btn-ghost" onclick="toast('Link copied to clipboard!')">Copy link</button>
+        </div>
+      </div>
+
+      <div class="stats-bar">
+        <div class="stat"><div class="stat-n">12</div><div class="stat-l">Projects</div></div>
+        <div class="stat"><div class="stat-n">8</div><div class="stat-l">3D models</div></div>
+        <div class="stat"><div class="stat-n">4</div><div class="stat-l">FEA studies</div></div>
+        <div class="stat"><div class="stat-n">3 yrs</div><div class="stat-l">Experience</div></div>
+      </div>
+
+      <div class="proj-grid">
+
+        <div class="proj-card" onclick="openProj('suspension')">
+          <div class="card-icon">⚙</div>
+          <div class="card-title">Suspension Bracket Redesign</div>
+          <div class="card-desc">Reduced part weight by 22% while maintaining fatigue life over 500k cycles. Validated with FEA and physical testing.</div>
+          <div class="card-chips">
+            <span class="chip a">SolidWorks</span>
+            <span class="chip g">CNC Milled</span>
+            <span class="chip">Al 6061</span>
+          </div>
+        </div>
+
+        <div class="proj-card" onclick="openProj('heat')">
+          <div class="card-icon">◎</div>
+          <div class="card-title">Shell &amp; Tube Heat Exchanger</div>
+          <div class="card-desc">Designed for 180°C oil-to-water transfer at 8 bar. CFD in Ansys Fluent matched analytical results to within 6%.</div>
+          <div class="card-chips">
+            <span class="chip a">Fusion 360</span>
+            <span class="chip g">CFD</span>
+            <span class="chip">SS 316</span>
+          </div>
+        </div>
+
+        <div class="proj-card" onclick="openProj('drone')">
+          <div class="card-icon">✦</div>
+          <div class="card-title">Carbon Fibre Drone Frame</div>
+          <div class="card-desc">UAV frame optimised for torsional stiffness. Composite layup schedule determined through FEA, manufactured in-house.</div>
+          <div class="card-chips">
+            <span class="chip a">CATIA V5</span>
+            <span class="chip g">FEA</span>
+            <span class="chip">CFRP</span>
+          </div>
+        </div>
+
+        <div class="add-card" onclick="toast('Upload .GLB, .PDF, and image files to add a project')">
+          <span class="plus">+</span>
+          Add project
+        </div>
+
+      </div>
+    </div>
+
+    <!-- VIEWER -->
+    <div class="page" id="page-viewer">
+      <div class="viewer-bar">
+        <span class="vb-name">Viewing: <b id="vf-name">no file loaded</b></span>
+        <div class="vb-tools">
+          <button class="vt-btn on" onclick="vMode(this,'Orbit')">Orbit</button>
+          <button class="vt-btn" onclick="vMode(this,'Pan')">Pan</button>
+          <button class="vt-btn" onclick="vMode(this,'Zoom')">Zoom</button>
+          <span style="width:1px;background:var(--border);display:inline-block;height:16px;margin:0 4px;align-self:center"></span>
+          <button class="vt-btn" onclick="resetCam()">Reset</button>
+          <button class="vt-btn" onclick="toast('Screenshot saved!')">Capture</button>
+        </div>
+      </div>
+
+      <div class="viewer-body">
+        <div class="viewer-stage">
+          <model-viewer
+            id="mv"
+            src=""
+            camera-controls
+            auto-rotate
+            shadow-intensity="0.8"
+            exposure="1.1"
+            tone-mapping="neutral"
+            ar ar-modes="webxr scene-viewer quick-look">
+          </model-viewer>
+
+          <div class="viewer-empty" id="ve">
+            <div class="ve-icon">◈</div>
+            <h3>No model loaded</h3>
+            <p>Select a .GLB from the sidebar, or drop one here to preview it in your browser.</p>
+            <label style="cursor:pointer;margin-top:4px">
+              <input type="file" accept=".glb,.gltf" style="display:none" onchange="loadLocal(event)">
+              <span class="btn btn-primary" style="display:inline-block">Browse files</span>
+            </label>
+          </div>
+
+          <div class="viewer-foot">
+            <div class="cam-btn" title="Front" onclick="setCam('0deg 90deg auto')">F</div>
+            <div class="cam-btn" title="Side"  onclick="setCam('90deg 90deg auto')">S</div>
+            <div class="cam-btn" title="Top"   onclick="setCam('0deg 0deg auto')">T</div>
+            <div class="cam-btn" title="Iso"   onclick="setCam('45deg 55deg auto')">I</div>
+          </div>
+        </div>
+
+        <div class="viewer-panel">
+          <div class="panel-sec">
+            <h4>File</h4>
+            <div class="p-row"><span class="k">Format</span><span class="v" id="pi-fmt">—</span></div>
+            <div class="p-row"><span class="k">Size</span><span class="v" id="pi-size">—</span></div>
+            <div class="p-row"><span class="k">Source</span><span class="v" id="pi-src">—</span></div>
+          </div>
+          <div class="panel-sec">
+            <h4>Display</h4>
+            <div class="p-row">
+              <span class="k">Auto-rotate</span>
+              <button class="toggle on" id="tog-rot" onclick="togRot(this)"></button>
+            </div>
+            <div class="p-row">
+              <span class="k">Shadows</span>
+              <button class="toggle on" id="tog-shad" onclick="togShad(this)"></button>
+            </div>
+            <div class="p-row">
+              <span class="k">Lighting</span>
+              <select class="s-select" onchange="setEnv(this.value)" style="font-size:12px;padding:3px 6px">
+                <option>Neutral</option>
+                <option>Legacy</option>
+                <option>Commerce</option>
+              </select>
+            </div>
+          </div>
+          <div class="drop-zone" onclick="document.getElementById('fi').click()">
+            Drop .GLB here or click to browse
+            <input type="file" id="fi" accept=".glb,.gltf" style="display:none" onchange="loadLocal(event)">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ABOUT -->
+    <div class="page" id="page-about">
+      <div class="about-head">
+        <div class="eyebrow">About</div>
+        <div class="about-name">Your Name — <b>Mechanical Engineer</b></div>
+        <div class="about-role">Open to full-time roles in mechanical design, product development, and structural analysis</div>
+      </div>
+
+      <div class="about-body">
+        <div class="about-left">
+          <p>I approach engineering problems with a focus on clean geometry, justified tolerances, and results I can defend with data. Recent work spans lightweight structural components, thermal systems, and composite manufacturing.</p>
+          <p>Comfortable taking a part from concept sketch to machined deliverable. I document every step.</p>
+
+          <div style="margin-top:24px">
+            <div class="sk-group">
+              <div class="sk-label">CAD &amp; Simulation</div>
+              <div class="sk-tags">
+                <span class="sk-tag hi">SolidWorks</span>
+                <span class="sk-tag hi">Fusion 360</span>
+                <span class="sk-tag">CATIA V5</span>
+                <span class="sk-tag">Ansys Mechanical</span>
+                <span class="sk-tag">Ansys Fluent</span>
+                <span class="sk-tag">SimScale</span>
+              </div>
+            </div>
+            <div class="sk-group">
+              <div class="sk-label">Manufacturing</div>
+              <div class="sk-tags">
+                <span class="sk-tag hi">CNC Milling</span>
+                <span class="sk-tag">Composite Layup</span>
+                <span class="sk-tag">Sheet Metal</span>
+                <span class="sk-tag">FDM / SLA</span>
+                <span class="sk-tag">GD&amp;T</span>
+              </div>
+            </div>
+            <div class="sk-group">
+              <div class="sk-label">Standards &amp; Tools</div>
+              <div class="sk-tags">
+                <span class="sk-tag">ASME Y14.5</span>
+                <span class="sk-tag">ISO 2768</span>
+                <span class="sk-tag">MATLAB</span>
+                <span class="sk-tag">Python</span>
+                <span class="sk-tag">Git</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="about-right">
+          <div class="info-card">
+            <h5>Contact</h5>
+            <div class="ic-row">✉ <a href="mailto:you@email.com">you@email.com</a></div>
+            <div class="ic-row">⊡ <a href="#">linkedin.com/in/yourname</a></div>
+            <div class="ic-row">◎ <a href="#">github.com/yourname</a></div>
+            <div class="ic-row">◷ City, State</div>
+          </div>
+          <div class="info-card">
+            <h5>Education</h5>
+            <div style="font-size:13px;font-weight:500">B.S. Mechanical Engineering</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:3px">University Name · 20XX</div>
+            <div style="font-size:12px;color:var(--accent);margin-top:2px;font-weight:500">GPA: 3.X / 4.0</div>
+          </div>
+          <button class="btn btn-primary" style="width:100%;margin-bottom:8px" onclick="toast('Opening resume…')">View resume PDF</button>
+          <button class="btn btn-ghost" style="width:100%" onclick="toast('Link copied!')">Copy portfolio link</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="page" id="page-settings">
+      <div class="settings-body">
+        <h2>Settings</h2>
+        <div class="sub">Privacy, display, and sharing options for this portfolio.</div>
+
+        <div class="sg">
+          <div class="sg-head">Privacy</div>
+          <div class="s-row">
+            <div class="s-info">
+              <div class="s-name">Search engine indexing</div>
+              <div class="s-desc">When off, robots.txt and meta tags hide this site from Google.</div>
+            </div>
+            <button class="toggle" onclick="this.classList.toggle('on')"></button>
+          </div>
+          <div class="s-row">
+            <div class="s-info">
+              <div class="s-name">Password protection</div>
+              <div class="s-desc">Require a passphrase before visitors can view anything.</div>
+            </div>
+            <button class="toggle" onclick="this.classList.toggle('on')"></button>
+          </div>
+          <div class="s-row">
+            <div class="s-info">
+              <div class="s-name">Download protection</div>
+              <div class="s-desc">Prevent direct download of .GLB files.</div>
+            </div>
+            <button class="toggle on" onclick="this.classList.toggle('on')"></button>
+          </div>
+        </div>
+
+        <div class="sg">
+          <div class="sg-head">3D Viewer</div>
+          <div class="s-row">
+            <div class="s-info">
+              <div class="s-name">Auto-rotate on load</div>
+              <div class="s-desc">Models spin on first load to show all angles.</div>
+            </div>
+            <button class="toggle on" onclick="this.classList.toggle('on')"></button>
+          </div>
+          <div class="s-row">
+            <div class="s-info">
+              <div class="s-name">Default lighting</div>
+            </div>
+            <select class="s-select">
+              <option>Neutral</option>
+              <option>Legacy</option>
+              <option>Commerce</option>
+            </select>
+          </div>
+          <div class="s-row">
+            <div class="s-info">
+              <div class="s-name">Mobile AR mode</div>
+              <div class="s-desc">Let employers place models in their space via phone.</div>
+            </div>
+            <button class="toggle on" onclick="this.classList.toggle('on')"></button>
+          </div>
+        </div>
+
+        <div class="sg">
+          <div class="sg-head">Portfolio info</div>
+          <div class="s-row">
+            <div class="s-info"><div class="s-name">Your name</div></div>
+            <input class="s-input" placeholder="Your Name">
+          </div>
+          <div class="s-row">
+            <div class="s-info"><div class="s-name">Page title</div></div>
+            <input class="s-input" placeholder="Engineering Portfolio">
+          </div>
+        </div>
+
+        <button class="btn btn-primary" onclick="toast('Settings saved!')">Save changes</button>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div id="toast"></div>
+
+<script>
+  const mv = document.getElementById('mv');
+  const ve = document.getElementById('ve');
+
+  function nav(id) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-' + id).classList.add('active');
+    const pages = ['home','viewer','about','settings'];
+    document.querySelectorAll('.nav-btn').forEach((b,i) => b.classList.toggle('active', pages[i] === id));
+  }
+
+  function fold(el) {
+    const kids = el.nextElementSibling;
+    if (kids?.classList.contains('tc')) {
+      kids.classList.toggle('open');
+      el.querySelector('.ti-icon').textContent = kids.classList.contains('open') ? '▾' : '▸';
+    }
+    document.querySelectorAll('.ti').forEach(t => t.classList.remove('sel'));
+    el.classList.add('sel');
+  }
+
+  function loadModel(name) {
+    nav('viewer');
+    document.getElementById('vf-name').textContent = name + '.glb';
+    document.getElementById('pi-fmt').textContent = 'GLB 2.0';
+    document.getElementById('pi-size').textContent = '—';
+    document.getElementById('pi-src').textContent = 'Repository';
+    ve.style.display = 'flex';
+    toast('Add the .glb file to your repo to preview it');
+  }
+
+  function loadLocal(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    mv.src = URL.createObjectURL(file);
+    ve.style.display = 'none';
+    document.getElementById('vf-name').textContent = file.name;
+    document.getElementById('pi-fmt').textContent = file.name.endsWith('.glb') ? 'GLB 2.0' : 'GLTF';
+    document.getElementById('pi-size').textContent = (file.size/1024/1024).toFixed(2) + ' MB';
+    document.getElementById('pi-src').textContent = 'Local file';
+    toast('Model loaded — use orbit controls to inspect');
+  }
+
+  function openProj(n) { loadModel(n); }
+  function resetCam() { mv.cameraOrbit = '0deg 75deg 105%'; toast('Camera reset'); }
+  function setCam(o) { mv.cameraOrbit = o; }
+  function vMode(btn, name) {
+    document.querySelectorAll('.vt-btn').forEach(b => b.classList.remove('on'));
+    btn.classList.add('on');
+    toast(name + ' mode');
+  }
+  function togRot(el) { el.classList.toggle('on'); mv.autoRotate = el.classList.contains('on'); }
+  function togShad(el) { el.classList.toggle('on'); mv.shadowIntensity = el.classList.contains('on') ? 0.8 : 0; }
+  function setEnv(v) { mv.toneMapping = v.toLowerCase(); }
+
+  let tt;
+  function toast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(tt);
+    tt = setTimeout(() => t.classList.remove('show'), 2600);
+  }
+
+  document.addEventListener('dragover', e => e.preventDefault());
+  document.addEventListener('drop', e => {
+    e.preventDefault();
+    const f = e.dataTransfer.files[0];
+    if (f && (f.name.endsWith('.glb') || f.name.endsWith('.gltf'))) {
+      nav('viewer');
+      loadLocal({ target: { files: [f] } });
+    }
+  });
+</script>
+</body>
+</html>
